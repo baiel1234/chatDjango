@@ -1,24 +1,19 @@
 {% extends 'base.html' %}
 {% block title %} Home {% endblock %}
 {% block content %}
-<div class="container mt-5" >
-    <h3>Welcome to Room</h3>
-    <div class="row">
-        <div class="col-lg-4">
-            <div class="w-100">
-                <div class="mb-3">
-                    <label for="textMessage" class="form-label">Enter your message:</label>
-                    <input type="text" class="form-control" id="textMessage">
-                </div>
-                <button id="addMessage" class="btn btn-primary rounded-1">Send</button>
-            </div>
+<div class="container mt-5">
+    <div class="black-square">
+        <h3>Welcome to Anonymous Room</h3>
+        <div class="mb-3">
+            <label for="textMessage" class="form-label">Enter your message:</label>
+            <input type="text" class="form-control" id="textMessage">
         </div>
-        <div class="col-lg-8">
-            <div id="messages" class="mt-4"></div>
-        </div>
+        <button id="addMessage" class="btn btn-primary rounded-1">Send</button>
     </div>
+    <div id="messages" class="mt-4"></div>
 </div>
 {% endblock %}
+
 
 {% block js_script %}
 <script>    
@@ -79,6 +74,14 @@
         container.appendChild(div);
     }
 
+    function getRandomColor() {
+        var letters = '0123456789ABCDEF';
+        var color = '#';
+        for (var i = 0; i < 6; i++) {
+            color += letters[Math.floor(Math.random() * 16)];
+        }
+        return color;
+    }
 </script>
 <style>
     .alert-success {
@@ -91,13 +94,34 @@
     body {
     background-image: url('https://www.shutterstock.com/image-vector/social-media-sketch-vector-seamless-600nw-1660950727.jpg');
     }
+    .black-square {
+        background-color: #000000;
+        padding: 20px; /* Adjust padding as needed */
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+    }
+
     h3 {
         color: #eb0b0b;
         font-size: 40px;
+        margin: 0; /* Remove default margin */
     }
-    label{
+
+    label {
         color: #eb0b0b;
-        font-size: 30px;
+        font-size: 20px;
     }
+
+    input[type="text"] {
+        width: 100%;
+        margin-bottom: 10px;
+    }
+
+    #addMessage {
+        width: 100%;
+    }
+    
 </style>
-{% endblock %}s
+{% endblock %}
