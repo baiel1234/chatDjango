@@ -5,6 +5,11 @@
     <div class="black-square">
         <h3>Welcome to Anonymous Room</h3>
         <div class="mb-3">
+            <label for="textName" class="form-label">Your Name:</label>
+            <input type="text" class="form-control" id="textName">
+            <button id="clearName" class="btn btn-secondary">Clear Name</button>
+        </div>
+        <div class="mb-3">
             <label for="textMessage" class="form-label">Enter your message:</label>
             <input type="text" class="form-control" id="textMessage">
         </div>
@@ -12,77 +17,87 @@
     </div>
     <div id="messages" class="mt-4"></div>
 </div>
+
+
 {% endblock %}
 
 
 {% block js_script %}
 <script>    
-    // setup chat scoket
-    const chatSocket = new WebSocket(
-        'ws://'
-        + window.location.host
-        + '/ws/chat/public_room/'
-    );
+    // setup chat socket
+const chatSocket = new WebSocket(
+    'ws://'
+    + window.location.host
+    + '/ws/chat/public_room/'
+);
 
-    // on socket open
-    chatSocket.onopen = function (e) {
-        console.log('Chat socket successfully connected.');
-    };
+// on socket open
+chatSocket.onopen = function (e) {
+    console.log('Chat socket successfully connected.');
+};
 
-    // on socket close
-    chatSocket.onclose = function (e) {
-        console.log('Chat socket closed unexpectedly');
-    };
+// on socket close
+chatSocket.onclose = function (e) {
+    console.log('Chat socket closed unexpectedly');
+};
 
-    // on receiving message on group
-    chatSocket.onmessage = function(e) {
-        const data = JSON.parse(e.data);
-        const message = data.message;
-        
-        setMessage(message);
-    };
+// on receiving message on group
+chatSocket.onmessage = function(e) {
+    const data = JSON.parse(e.data);
+    const message = data.message;
+    const sender = data.sender; // Extract sender's name
+    
+    setMessage(sender, message); // Pass sender's name to setMessage function
+};
 
-    // sending the text message to server
-    document.querySelector('#addMessage').onclick = function(e) {
-            const messageInputDom = document.querySelector('#textMessage');
-            const message = messageInputDom.value;
+// sending the text message to server
+document.querySelector('#addMessage').onclick = function(e) {
+    const nameInputDom = document.querySelector('#textName'); // Get user's name input field
+    const messageInputDom = document.querySelector('#textMessage');
+    const name = nameInputDom.value; // Get user's name
+    const message = messageInputDom.value;
 
-            chatSocket.send(JSON.stringify({
-                'message': message
-            }));
-            
-            messageInputDom.value = '';
-    };
+    chatSocket.send(JSON.stringify({
+        'message': message,
+        'sender': name // Send user's name along with the message
+    }));
+    
+    // Clear input field after sending message
+    messageInputDom.value = '';
+};
 
-    // helper func setting message
-    function setMessage(message){
-        var div = document.createElement('div');
-        div.className = 'alert alert-success alert-dismissible fade show';
-        div.setAttribute('role', 'alert');
+// Clear name input field
+document.querySelector('#clearName').onclick = function(e) {
+    document.querySelector('#textName').value = ''; // Clear the name input field
+};
 
-        var message = document.createTextNode(message);
-        div.appendChild(message);
-         
-        var closeButton = document.createElement('button');
-        closeButton.type = 'button';
-        closeButton.className = 'btn-close';
-        closeButton.setAttribute('data-bs-dismiss', 'alert');
-        closeButton.setAttribute('aria-label', 'Close');
-        div.appendChild(closeButton);
+// helper func setting message
+function setMessage(sender, message){ // Modify the function to accept sender's name
+    var div = document.createElement('div');
+    div.className = 'alert alert-success alert-dismissible fade show';
+    div.setAttribute('role', 'alert');
 
-        var container = document.getElementById('messages');  
-        container.appendChild(div);
-    }
+    var senderPara = document.createElement('p'); // Add paragraph for sender's name
+    senderPara.textContent = sender; // Assign sender's name
+    div.appendChild(senderPara);
 
-    function getRandomColor() {
-        var letters = '0123456789ABCDEF';
-        var color = '#';
-        for (var i = 0; i < 6; i++) {
-            color += letters[Math.floor(Math.random() * 16)];
-        }
-        return color;
-    }
+    var messageContent = document.createElement('p'); // Add paragraph for message content
+    messageContent.textContent = message; // Assign message content
+    div.appendChild(messageContent);
+    
+    var closeButton = document.createElement('button');
+    closeButton.type = 'button';
+    closeButton.className = 'btn-close';
+    closeButton.setAttribute('data-bs-dismiss', 'alert');
+    closeButton.setAttribute('aria-label', 'Close');
+    div.appendChild(closeButton);
+
+    var container = document.getElementById('messages');  
+    container.appendChild(div);
+}
+
 </script>
+
 <style>
     .alert-success {
         background-color: #28a745; /* green color */
